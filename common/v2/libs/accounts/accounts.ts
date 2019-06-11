@@ -8,6 +8,8 @@ import BN from 'bn.js';
 import { getNetworkByName, getNodesByNetwork } from '../networks/networks';
 import { Network, NodeOptions } from 'v2/services/Network/types';
 import RpcNode from '../nodes/rpc';
+import { Settings } from 'v2/services/Settings/types';
+import { getSettings } from '../settings/settings';
 
 export const getCurrentsFromContext = (
   accounts: ExtendedAccount[],
@@ -100,4 +102,16 @@ export const getAllAccounts = (): Account[] => {
 
 export const getAllAccountKeys = (): string[] => {
   return Object.keys(getCache().accounts);
+};
+
+export const getAllDashboardAccounts = (): string[] => {
+  const settings: Settings = getSettings();
+  return settings.dashboardAccounts;
+};
+
+export const isDashboardAccount = (uuid: string): boolean => {
+  const dashboardAccounts: string[] = getAllDashboardAccounts();
+  console.log('got here');
+  console.log(dashboardAccounts.indexOf(uuid) >= 0);
+  return dashboardAccounts.indexOf(uuid) >= 0;
 };
