@@ -17,16 +17,22 @@ function SaveAndRedirect(payload: { formData: FormData }) {
   const { createAccountWithID } = useContext(AccountContext);
   const { settings, updateSettingsAccounts } = useContext(SettingsContext);
   const { displayNotification } = useContext(NotificationsContext);
+  console.log('1');
   useEffect(() => {
+    console.log('2');
     const network: Network | undefined = getNetworkByName(payload.formData.network);
+    console.log('3');
     if (!network || getAccountByAddress(payload.formData.account)) {
+      console.log('4');
       displayNotification(NotificationTemplates.walletNotAdded, {
         address: payload.formData.account
       });
     } else {
+      console.log('5');
       const newAsset: Asset = getNewDefaultAssetTemplateByNetwork(network);
       const newAssetID: string = generateUUID();
       const newUUID = generateUUID();
+      console.log('6');
       const account: Account = {
         address: payload.formData.account,
         network: payload.formData.network,
@@ -38,15 +44,20 @@ function SaveAndRedirect(payload: { formData: FormData }) {
         transactions: [],
         timestamp: 0
       };
+      console.log('7');
       createAccountWithID(account, newUUID);
+      console.log('8');
       updateSettingsAccounts([...settings.dashboardAccounts, newUUID]);
+      console.log('9');
       createAssetWithID(newAsset, newAssetID);
+      console.log('10');
       displayNotification(NotificationTemplates.walletAdded, {
         address: account.address
       });
+      console.log('11');
     }
   });
-
+  console.log('12');
   return (
     <Route>
       <Redirect to="/dashboard" />

@@ -18,13 +18,11 @@ import { IAsset, TSymbol } from 'v2/types';
 import { InlineErrorMsg } from 'v2/components';
 import { getNonce } from 'v2/features/Nonce';
 import { getGasEstimate, fetchGasPriceEstimates } from 'v2/features/Gas';
-import { getResolvedENSAddress } from 'v2/features/Ens';
 import { ISendState, ITxFields } from '../types';
 import {
   AccountDropdown,
   AssetDropdown,
   DataField,
-  EthAddressField,
   GasLimitField,
   GasPriceField,
   GasPriceSlider,
@@ -34,7 +32,8 @@ import {
   validateDataField,
   validateGasLimitField,
   validateGasPriceField,
-  validateNonceField
+  validateNonceField,
+  validateRecipientField
 } from './validators/validators';
 import './SendAssetsForm.scss';
 import { getAssetByUUID, getNetworkByName } from 'v2/libs';
@@ -44,7 +43,7 @@ import { validateTxFields } from 'v2/libs/validators';
 
 import TransactionFeeDisplay from './displays/TransactionFeeDisplay';
 import TransactionValueDisplay from './displays/TransactionValuesDisplay';
-import ENSStatus from 'v2/components/ENSStatus';
+import RecipientAddressField from './fields/EthAddressField';
 
 interface Props {
   stateValues: ISendState;
@@ -119,25 +118,6 @@ export default function SendAssetsForm({
             setFieldValue('gasLimitEstimated', gas);
           };
 
-          const handleENSResolve = async (name: string) => {
-            if (!values || !values.network) {
-              return;
-            }
-            setFieldValue('isResolvingNSName', true);
-            const resolvedAddress: string | null = await getResolvedENSAddress(
-              values.network,
-              name
-            );
-            setFieldValue('isResolvingNSName', false);
-            resolvedAddress === null
-              ? setFieldValue('resolvedNSAddress', '0x0')
-              : setFieldValue('resolvedNSAddress', resolvedAddress);
-
-            if (resolvedAddress) {
-              handleGasEstimate();
-            }
-          };
-
           const handleFieldReset = () => {
             setFieldValue('account', undefined);
             setFieldValue('recipientAddress', '');
@@ -168,6 +148,12 @@ export default function SendAssetsForm({
               <br />
               <pre style={{ fontSize: '0.75rem' }}>{`Gas Limit Estimated: ${
                 values.gasLimitEstimated
+              }`}</pre>
+              <pre style={{ fontSize: '0.75rem' }}>{`RecipientAddress: ${
+                values.recipientAddress
+              }`}</pre>
+              <pre style={{ fontSize: '0.75rem' }}>{`ResolvedNSAddress: ${
+                values.resolvedNSAddress
               }`}</pre>
               <QueryWarning />
 
@@ -228,20 +214,22 @@ export default function SendAssetsForm({
                 <label htmlFor="recipientAddress" className="input-group-header">
                   {translate('SEND_ADDR')}
                 </label>
-                <EthAddressField
-                  handleENSResolve={handleENSResolve}
-                  handleGasEstimate={handleGasEstimate}
-                  error={errors.recipientAddress}
-                  touched={touched.recipientAddress}
-                  values={values}
-                  fieldName="recipientAddress"
-                  placeholder={translateRaw('TO_FIELD_PLACEHOLDER')}
-                />
-                <ENSStatus
-                  ensAddress={values.recipientAddress}
-                  isLoading={values.isResolvingNSName}
-                  rawAddress={values.resolvedNSAddress}
-                  chainId={values.network ? values.network.chainId : 1}
+                <Field
+                  name="recipientAddress"
+                  validate={(e: string) => {
+                    validateRecipientField(e, values);
+                  }}
+                  component={({ field, form }: FieldProps) => (
+                    <RecipientAddressField
+                      {...field}
+                      form={form}
+                      handleGasEstimate={handleGasEstimate}
+                      error={errors.recipientAddress}
+                      touched={touched.recipientAddress}
+                      values={values}
+                      placeholder={translateRaw('TO_FIELD_PLACEHOLDER')}
+                    />
+                  )}
                 />
               </fieldset>
               {/* Amount */}

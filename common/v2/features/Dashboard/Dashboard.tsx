@@ -15,6 +15,7 @@ import './Dashboard.scss';
 import { AccountContext, AddressBookContext } from 'v2/providers';
 
 export default function Dashboard() {
+  console.log('13');
   return (
     <>
       {/* MOBILE */}

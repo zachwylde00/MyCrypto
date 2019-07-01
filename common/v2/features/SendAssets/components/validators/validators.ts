@@ -2,9 +2,12 @@ import {
   isValidHex,
   gasPriceValidator,
   gasLimitValidator,
-  isValidAmount
+  isValidAmount,
+  isValidETHAddress,
+  getIsValidENSAddressFunction
 } from 'v2/libs/validators';
 import { translateRaw } from 'translations';
+import { ITxFields } from '../../types';
 
 export function validateGasPriceField(value: string): string | undefined {
   if (!gasPriceValidator(value)) {
@@ -34,4 +37,21 @@ export function validateAmountField(value: string): string | undefined {
   if (!isValidAmount(parseFloat(value))) {
     return translateRaw('ERROR_0');
   }
+}
+
+export function validateRecipientField(value: string, values: ITxFields): string | undefined {
+  let errorMsg;
+  if (!value) {
+    errorMsg = translateRaw('REQUIRED');
+  } else if (!isValidETHAddress(value)) {
+    if (values && values.network) {
+      const isValidENS = getIsValidENSAddressFunction(values.network.chainId);
+      if (!isValidENS(value)) {
+        errorMsg = translateRaw('TO_FIELD_ERROR');
+      }
+    } else {
+      errorMsg = translateRaw('TO_FIELD_ERROR');
+    }
+  }
+  return errorMsg;
 }
