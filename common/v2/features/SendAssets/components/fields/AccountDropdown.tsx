@@ -3,8 +3,7 @@ import { translateRaw } from 'translations';
 
 // import { getNetworkByName } from 'v2/services/Store';
 import { AccountSummary, AccountOption, Dropdown } from 'v2/components';
-import { ExtendedAccount, Network } from 'v2/types';
-import { Asset } from 'v2/config/tokens';
+import { Asset, ExtendedAccount, Network } from 'v2/types';
 import { getNetworkByName } from 'v2/services/Store/Network';
 
 // Option item displayed in Dropdown menu. Props are passed by react-select Select.
@@ -31,7 +30,7 @@ function AccountDropdown({
   let relevantAccounts: ExtendedAccount[] = accounts;
   if (asset && network) {
     relevantAccounts = accounts.filter((account: ExtendedAccount): boolean => {
-      const accountNetwork: Network | undefined = getNetworkByName(account.network);
+      const accountNetwork: Network | undefined = getNetworkByName(account.networkId);
       return !accountNetwork ? false : accountNetwork.name === network.name;
     });
   }

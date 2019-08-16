@@ -76,7 +76,7 @@ function buildAccountTable(accounts: ExtendedAccount[], deleteAccount: DeleteAcc
           truncate={truncate}
         />,
         <Network key={index + bodyItemCount++} color="#a682ff">
-          {account.network}
+          {account.networkId}
         </Network>,
         <Typography key={index + bodyItemCount++}>{account.balance}</Typography>,
         <DeleteButton
