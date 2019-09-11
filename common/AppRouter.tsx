@@ -6,7 +6,7 @@ import { BroadcastTx, Contracts, GenerateWallet, SendTransaction, SupportPage } 
 import { Layout } from 'v2/features/Layout';
 import { Home, PageNotFound } from 'v2/features';
 import { useDevMode } from 'v2/services';
-import { ScreenLockProvider } from 'v2/providers';
+import { ScreenLockProvider } from 'v2/services/Store';
 import { IS_PROD, IS_DOWNLOADABLE } from 'v2/utils';
 import { ROUTE_PATHS } from 'v2/config';
 import {

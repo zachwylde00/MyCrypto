@@ -5,7 +5,7 @@ import styled from 'styled-components';
 import translate, { translateRaw } from 'translations';
 
 import { ExtendedContentPanel, InputField } from 'v2/components';
-import { ScreenLockContext } from 'v2/providers';
+import { ScreenLockContext } from 'v2/services/Store';
 import { AnalyticsService, ANALYTICS_CATEGORIES } from 'v2/services';
 
 // Legacy

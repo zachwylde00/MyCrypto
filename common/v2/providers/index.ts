@@ -4,4 +4,5 @@ export {
   NotificationsProvider,
   NotificationTemplates
 } from './NotificationsProvider';
-export * from './ScreenLockProvider';
+export const ScreenLockContext = {};
+export const ScreenLockProvider = {};

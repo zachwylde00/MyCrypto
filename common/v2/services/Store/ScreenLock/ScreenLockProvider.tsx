@@ -4,20 +4,17 @@ import CryptoJS, { SHA256, AES } from 'crypto-js';
 
 import { translateRaw } from 'translations';
 import { ROUTE_PATHS } from 'v2/config';
+import { default as ScreenLockLocking } from 'v2/features/ScreenLock/ScreenLockLocking';
 import {
-  readAllSettings,
   getCache,
   setEncryptedCache,
   destroyCache,
   getEncryptedCache,
   setCache,
   destroyEncryptedCache
-} from 'v2/services/Store';
-import {
-  updateScreenLockSettings,
-  readScreenLockSettings
-} from 'v2/services/Store/ScreenLock/ScreenLockSettings';
-import { ScreenLockLocking } from 'v2/features';
+} from '../LocalCache';
+import { readAllSettings } from '../Settings';
+import { updateScreenLockSettings, readScreenLockSettings } from './ScreenLockSettings';
 
 interface State {
   locking: boolean;
@@ -182,14 +179,15 @@ class ScreenLockProvider extends Component<RouteComponentProps<{}>, State> {
 
     return (
       <ScreenLockContext.Provider value={this.state}>
-        {locking && (
+        {locking ? (
           <ScreenLockLocking
             onScreenLockClicked={() => this.handleCountdownEnded()}
             onCancelLockCountdown={() => this.cancelLockCountdown()}
             timeLeft={timeLeft}
           />
+        ) : (
+          children
         )}
-        {children}
       </ScreenLockContext.Provider>
     );
   }

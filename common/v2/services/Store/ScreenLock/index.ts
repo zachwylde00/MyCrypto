@@ -1,1 +1,1 @@
-export * from './ScreenLockSettings';
+export { ScreenLockContext, default as ScreenLockProvider } from './ScreenLockProvider';
