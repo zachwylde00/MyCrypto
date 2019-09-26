@@ -7,6 +7,8 @@ import sendIcon from 'common/assets/images/icn-send.svg';
 import { AddressBookContext } from 'v2/services/Store';
 import { Amount } from 'v2/components';
 import { fromWei, Wei, totalTxFeeToString, totalTxFeeToWei } from 'v2/services/EthService';
+import { RatesContext } from 'v2/services/RatesProvider';
+import { TTicker } from 'v2/types';
 
 import { IStepComponentProps } from '../types';
 import './ConfirmTransaction.scss';
@@ -22,13 +24,18 @@ const truncate = (children: string) => {
   The currentPath in SendAssets determines which action should be called.
 */
 
+const calculateValue = (rate: number | undefined, balance: string) => {
+  if (!rate) return 0;
+  return rate * parseFloat(balance);
+};
+
 export default function ConfirmTransaction({
   txConfig,
   onComplete,
   signedTx
 }: IStepComponentProps) {
   const { getContactByAccount, getContactByAddressAndNetwork } = useContext(AddressBookContext);
-
+  const { getRate } = useContext(RatesContext);
   const recipientContact = getContactByAddressAndNetwork(
     txConfig.receiverAddress,
     txConfig.network
@@ -97,7 +104,10 @@ export default function ConfirmTransaction({
           <img src={sendIcon} alt="Send" /> Send Amount:
         </div>
         <div className="ConfirmTransaction-row-column">
-          <Amount assetValue={`${amount} ${asset.ticker}`} fiatValue="$1" />
+          <Amount
+            assetValue={`${amount} ${asset.ticker}`}
+            fiatValue={`$${calculateValue(getRate(asset.ticker as TTicker), amount).toFixed(2)}`}
+          />
         </div>
       </div>
       <div className="ConfirmTransaction-row">
@@ -105,7 +115,13 @@ export default function ConfirmTransaction({
           <img src={feeIcon} alt="Fee" /> Max. Transaction Fee:
         </div>
         <div className="ConfirmTransaction-row-column">
-          <Amount assetValue={`${maxTransactionFeeBase} ${baseAsset.ticker}`} fiatValue="$1" />
+          <Amount
+            assetValue={`${maxTransactionFeeBase} ${baseAsset.ticker}`}
+            fiatValue={`$${calculateValue(
+              getRate(baseAsset.ticker as TTicker),
+              maxTransactionFeeBase
+            ).toFixed(2)}`}
+          />
         </div>
       </div>
       <div className="ConfirmTransaction-divider" />
@@ -115,12 +131,21 @@ export default function ConfirmTransaction({
         </div>
         <div className="ConfirmTransaction-row-column">
           {assetType === 'base' ? (
-            <Amount assetValue={`${totalEtherEgress} ${asset.ticker}`} fiatValue="$1" />
+            <Amount
+              assetValue={`${totalEtherEgress} ${asset.ticker}`}
+              fiatValue={`$${calculateValue(
+                getRate(asset.ticker as TTicker),
+                totalEtherEgress
+              ).toFixed(2)}`}
+            />
           ) : (
             <Amount
               assetValue={`${amount} ${asset.ticker}`}
               baseAssetValue={`+ ${totalEtherEgress} ${baseAsset.ticker}`}
-              fiatValue="$1"
+              fiatValue={`$${(
+                calculateValue(getRate(asset.ticker as TTicker), amount) +
+                calculateValue(getRate(baseAsset.ticker as TTicker), totalEtherEgress)
+              ).toFixed(2)}`}
             />
           )}
         </div>
